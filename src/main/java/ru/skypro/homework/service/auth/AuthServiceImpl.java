@@ -1,12 +1,11 @@
-package ru.skypro.homework.service.impl;
+package ru.skypro.homework.service.auth;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
-import ru.skypro.homework.dto.Register;
-import ru.skypro.homework.service.AuthService;
+import ru.skypro.homework.model.dto.Register;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -21,11 +20,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public boolean login(String userName, String password) {
-        if (!manager.userExists(userName)) {
+    public boolean login(String username, String password) {
+        if (!manager.userExists(username)) {
             return false;
         }
-        UserDetails userDetails = manager.loadUserByUsername(userName);
+        UserDetails userDetails = manager.loadUserByUsername(username);
         return encoder.matches(password, userDetails.getPassword());
     }
 

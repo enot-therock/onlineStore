@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/changes/changeSet_001.sql
