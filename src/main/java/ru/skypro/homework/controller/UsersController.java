@@ -2,9 +2,9 @@ package ru.skypro.homework.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.skypro.homework.dto.NewPassword;
-import ru.skypro.homework.dto.UpdateUser;
-import ru.skypro.homework.dto.UserDTO;
+import ru.skypro.homework.model.dto.NewPassword;
+import ru.skypro.homework.model.dto.UpdateUser;
+import ru.skypro.homework.model.dto.UserDTO;
 
 import java.awt.*;
 
@@ -15,7 +15,8 @@ public class UsersController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/set_password")
-    public NewPassword setPassword(@RequestBody String currentPassword, String newPassword) {
+    public NewPassword setPassword(@RequestParam String currentPassword,
+                                   @RequestParam String newPassword) {
         return new NewPassword(currentPassword, newPassword);
     }
 
@@ -27,7 +28,9 @@ public class UsersController {
 
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/me")
-    public UpdateUser editUsersDate(@RequestBody String firstName, String lastName, String phone) {
+    public UpdateUser editUsersDate(@RequestParam String firstName,
+                                    @RequestParam String lastName,
+                                    @RequestParam String phone) {
         return new UpdateUser(firstName, lastName, phone);
     }
 

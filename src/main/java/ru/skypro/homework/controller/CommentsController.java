@@ -2,8 +2,8 @@ package ru.skypro.homework.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.skypro.homework.dto.Comments;
-import ru.skypro.homework.dto.CreateOrUpdateComment;
+import ru.skypro.homework.model.dto.Comments;
+import ru.skypro.homework.model.dto.CreateOrUpdateComment;
 
 @RestController
 @RequestMapping("/ads")
@@ -11,25 +11,27 @@ import ru.skypro.homework.dto.CreateOrUpdateComment;
 public class CommentsController {
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/ads/{id}/comments")
+    @GetMapping("/{id}/comments")
     public Comments getAdComments(@PathVariable int id) {
         return new Comments();
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/ads/{id}/comments")
+    @PostMapping("/{id}/comments")
     public Comments createComment(@RequestBody CreateOrUpdateComment createOrUpdateComment) {
         return new Comments();
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping("/ads/{adId}/comments/{commentId}")
-    public void deleteAds(@PathVariable int adId, int commentId) {
+    @DeleteMapping("/{adId}/comments/{commentId}")
+    public void deleteAds(@PathVariable int adId,
+                          @PathVariable int commentId) {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PatchMapping("/ads/{adId}/comments/{commentId}")
-    public Comments editComment(@PathVariable int adId, int commentId) {
+    @PatchMapping("/{adId}/comments/{commentId}")
+    public Comments editComment(@PathVariable int adId,
+                                @PathVariable int commentId) {
         return new Comments();
     }
 }

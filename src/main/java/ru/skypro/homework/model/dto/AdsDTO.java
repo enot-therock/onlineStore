@@ -1,18 +1,18 @@
-package ru.skypro.homework.dto;
+package ru.skypro.homework.model.dto;
 
 import java.util.List;
 
-public class Comments {
+public class AdsDTO {
 
     private int count;
-    private List<CommentDTO> result;
+    private List<AdvertisementDTO> result;
 
-    public Comments(int count, List<CommentDTO> result) {
+    public AdsDTO(int count, List<AdvertisementDTO> result) {
         this.count = count;
         this.result = result;
     }
 
-    public Comments() {
+    public AdsDTO() {
     }
 
     public int getCount() {
@@ -23,11 +23,11 @@ public class Comments {
         this.count = count;
     }
 
-    public List<CommentDTO> getResult() {
+    public List<AdvertisementDTO> getResult() {
         return result;
     }
 
-    public void setResult(List<CommentDTO> result) {
+    public void setResult(List<AdvertisementDTO> result) {
         this.result = result;
     }
 }

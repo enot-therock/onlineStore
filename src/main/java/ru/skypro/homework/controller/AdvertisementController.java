@@ -2,10 +2,10 @@ package ru.skypro.homework.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.skypro.homework.dto.AdsDTO;
-import ru.skypro.homework.dto.AdvertisementDTO;
-import ru.skypro.homework.dto.CreateOrUpdateAd;
-import ru.skypro.homework.dto.ExtendedAd;
+import ru.skypro.homework.model.dto.AdsDTO;
+import ru.skypro.homework.model.dto.AdvertisementDTO;
+import ru.skypro.homework.model.dto.CreateOrUpdateAd;
+import ru.skypro.homework.model.dto.ExtendedAd;
 
 import java.awt.*;
 
@@ -15,44 +15,47 @@ import java.awt.*;
 public class AdvertisementController {
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/ads")
+    @GetMapping()
     public AdsDTO getAllAds() {
         return new AdsDTO();
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/ads")
-    public AdvertisementDTO createNewAds(@RequestBody int author, String image,
-                                         int pk, int price, String title) {
+    @PostMapping()
+    public AdvertisementDTO createNewAds(@RequestParam int author,
+                                         @RequestParam String image,
+                                         @RequestParam int pk,
+                                         @RequestParam int price,
+                                         @RequestParam String title) {
         return new AdvertisementDTO(author, image, pk, price, title);
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/ads/{id}")
+    @GetMapping("/{id}")
     public ExtendedAd getAd(@PathVariable int id) {
         return new ExtendedAd();
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping("/ads/{id}")
+    @DeleteMapping("/{id}")
     public void deleteAds(@PathVariable int id) {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/ads/{id}")
+    @PostMapping("/{id}")
     public AdvertisementDTO editAds(@PathVariable int id,
                                     @RequestBody CreateOrUpdateAd createOrUpdateAd) {
         return new AdvertisementDTO();
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/ads/me")
+    @GetMapping("/me")
     public AdsDTO getAllUsersAds() {
         return new AdsDTO();
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PatchMapping("/ads/{id}/image")
+    @PatchMapping("/{id}/image")
     public Image editAdsImage(@PathVariable int id) {
         return null;
     }
