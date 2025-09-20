@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.skypro.homework.model.dto.Register;
-import ru.skypro.homework.service.auth.AuthServiceImpl;
+import ru.skypro.homework.service.AuthServiceImpl;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
