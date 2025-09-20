@@ -1,4 +1,4 @@
-package ru.skypro.homework.service.auth;
+package ru.skypro.homework.service;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
