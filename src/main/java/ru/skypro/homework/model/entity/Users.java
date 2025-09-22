@@ -1,5 +1,8 @@
 package ru.skypro.homework.model.entity;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import ru.skypro.homework.model.dto.Role;
 
 import javax.persistence.*;
@@ -13,20 +16,42 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username")
+    @NotBlank(message = "Username is required")
+    @Size(min = 4, max = 32, message = "Username must be between 4 and 32 symbol")
+    @Column(name = "username", length = 32, nullable = false)
     private String username;
 
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, max = 16, message = "Password must be between 8 and 16 symbol")
+    @Column(name = "password")
+    private String password;
+
+    @Size(min = 2, max = 16, message = "First name must be between 2 and 16 symbol")
     @Column(name = "firstName")
     private String firstName;
 
+    @Size(min = 2, max = 16, message = "Last name must be between 2 and 16 symbol")
     @Column(name = "lastName")
     private String lastName;
 
+    @NotBlank(message = "The user role must be selected")
     @Column(name = "role")
     private Role role;
 
     @Column(name = "image")
     private String image;
+
+    @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "\\+7\\s?\\(?\\d{3}\\)?\\s?\\d{3}-?\\d{2}-?\\d{2}",
+            message = "Phone number must have the appearance:" +
+                    " +7(777)7777777 \n" +
+                    " +77777777777 \n" +
+                    " +7 777 777-77-77 \n" +
+                    " +7 (777) 777-77-77 \n" +
+                    " +7(777)777-77-77 \n" +
+                    " +7 7777777777")
+    @Column(name = "phone")
+    private String phone;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Advertisement> advertisement;
@@ -35,17 +60,21 @@ public class Users {
     private List<Comment> comment;
 
     public Users(String username,
+                 String password,
                  String firstName,
                  String lastName,
                  Role role,
                  String image,
+                 String phone,
                  List<Advertisement> advertisement,
                  List<Comment> comment) {
         this.username = username;
+        this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
         this.image = image;
+        this.phone = phone;
         this.advertisement = advertisement;
         this.comment = comment;
     }
@@ -67,6 +96,14 @@ public class Users {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFirstName() {
@@ -99,6 +136,14 @@ public class Users {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public List<Advertisement> getAdvertisement() {

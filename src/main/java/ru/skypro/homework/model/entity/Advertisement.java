@@ -1,5 +1,8 @@
 package ru.skypro.homework.model.entity;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -11,20 +14,24 @@ public class Advertisement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(min = 8, max = 64, message = "Description must be between 8 and 64 symbol")
     @Column(name = "description")
     private String description;
 
     @Column(name = "image")
     private String image;
 
+    @NotBlank(message = "Title is required")
+    @Size(min = 4, max = 32, message = "Title must be between 4 and 32 symbol")
     @Column(name = "title")
     private String title;
 
+    @Size(max = 10000000, message = "Price must have maximum 10000000 symbol")
     @Column(name = "price")
     private int price;
 
-    @OneToOne
-    @JoinColumn(name = "userId", referencedColumnName = "id")
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Users user;
 
     @OneToMany(mappedBy = "advertisement", cascade = CascadeType.ALL)

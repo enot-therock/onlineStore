@@ -12,20 +12,20 @@ public class Comment {
     private Long id;
 
     @Column(name = "createdAt")
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     @Column(name = "text")
     private String text;
 
     @OneToOne
-    @JoinColumn(name = "userId", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Users user;
 
     @OneToOne
-    @JoinColumn(name = "advertisementId", referencedColumnName = "id")
+    @JoinColumn(name = "advertisement_id", referencedColumnName = "id")
     private Advertisement advertisement;
 
-    public Comment(LocalDateTime createdAt, String text, Users user, Advertisement advertisement) {
+    public Comment(String createdAt, String text, Users user, Advertisement advertisement) {
         this.createdAt = createdAt;
         this.text = text;
         this.user = user;
@@ -43,11 +43,11 @@ public class Comment {
         this.id = id;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
