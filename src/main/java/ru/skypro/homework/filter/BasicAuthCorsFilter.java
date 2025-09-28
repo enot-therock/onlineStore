@@ -10,15 +10,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static ru.skypro.homework.utils.PatternUtils.PATTERN_CORS_HEADER;
+
 @Component
 public class BasicAuthCorsFilter extends OncePerRequestFilter {
+
+    /**
+     * метод одностороннего шифрования пароля
+     * @param httpServletRequest - HTTP запрос пользователя
+     * @param httpServletResponse - HTTP ответ сервера
+     * @param filterChain - цепочка фильтров запроса
+     * @throws ServletException - обработка возможных ошибок при взаимодействии доменов
+     * addHeader - CORS, который фильтрует домены
+     */
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest,
                                     HttpServletResponse httpServletResponse,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-        httpServletResponse.addHeader("Access-Control-Allow-Credentials", "true");
+        httpServletResponse.addHeader(PATTERN_CORS_HEADER, "true");
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 }

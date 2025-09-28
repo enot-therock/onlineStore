@@ -1,46 +1,61 @@
 package ru.skypro.homework.service;
 
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.model.dto.Register;
+import ru.skypro.homework.model.entity.Users;
+import ru.skypro.homework.repository.UsersRepository;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private final UserDetailsManager manager;
     private final PasswordEncoder encoder;
+    private final UsersRepository usersRepository;
 
-    public AuthServiceImpl(UserDetailsManager manager,
-                           PasswordEncoder passwordEncoder) {
-        this.manager = manager;
-        this.encoder = passwordEncoder;
+    public AuthServiceImpl(PasswordEncoder encoder,
+                           UsersRepository usersRepository) {
+        this.encoder = encoder;
+        this.usersRepository = usersRepository;
     }
+
+    /**
+     * метод авторизации пользователя
+     * @param username - email
+     * @param password - пароль
+     * @return - получаем результат авториции, как логическое выражение
+     */
 
     @Override
     public boolean login(String username, String password) {
-        if (!manager.userExists(username)) {
-            return false;
-        }
-        UserDetails userDetails = manager.loadUserByUsername(username);
-        return encoder.matches(password, userDetails.getPassword());
+        return usersRepository.findByUsername(username)
+                .map(user -> encoder.matches(password, user.getPassword()))
+                .orElse(false);
     }
+
+    /**
+     * метод регистрации нового пользователя
+     * @param register - DTO с исходными данными
+     * @return - возвращаем логическое выражение как результат регистрации
+     * и сохраняем нового пользователя
+     */
 
     @Override
     public boolean register(Register register) {
-        if (manager.userExists(register.getUsername())) {
+        if (usersRepository.existsByUsername(register.getUsername())) {
             return false;
         }
-        manager.createUser(
-                User.builder()
-                        .passwordEncoder(this.encoder::encode)
-                        .password(register.getPassword())
-                        .username(register.getUsername())
-                        .roles(register.getRole().name())
-                        .build());
+
+        Users newUser = new Users();
+        newUser.setUsername(register.getUsername());
+        newUser.setPassword(encoder.encode(register.getPassword()));
+        newUser.setFirstName(register.getFirstName());
+        newUser.setLastName(register.getLastName());
+        newUser.setPhone(register.getPhone());
+        newUser.setRole(register.getRole());
+        newUser.setEnabled(true);
+
+        usersRepository.save(newUser);
+
         return true;
     }
-
 }

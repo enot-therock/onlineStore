@@ -5,14 +5,14 @@ public class CommentDTO {
     private int author;
     private String authorImage;
     private String authorFirsName;
-    private int createdAt;
+    private Long createdAt;
     private int pk;
     private String text;
 
     public CommentDTO(int author,
                       String authorImage,
                       String authorFirsName,
-                      int createdAt,
+                      Long createdAt,
                       int pk,
                       String text) {
         this.author = author;
@@ -50,11 +50,11 @@ public class CommentDTO {
         this.authorFirsName = authorFirsName;
     }
 
-    public int getCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(int createdAt) {
+    public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
     }
 
