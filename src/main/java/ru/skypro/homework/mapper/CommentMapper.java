@@ -7,6 +7,8 @@ import ru.skypro.homework.model.dto.CommentDTO;
 import ru.skypro.homework.model.dto.CreateOrUpdateComment;
 import ru.skypro.homework.model.entity.Comment;
 
+import java.time.Instant;
+
 @Mapper(componentModel = "spring")
 public interface CommentMapper {
 
@@ -18,7 +20,7 @@ public interface CommentMapper {
     @Mapping(source = "user.firstName", target = "authorFirsName")
     @Mapping(source = "user.image", target = "authorImage")
     @Mapping(source = "id", target = "pk")
-    @Mapping(source = "createdAt", target = "createdAt", qualifiedByName = "stringToInt" )
+    @Mapping(source = "createdAt", target = "createdAt", qualifiedByName = "instantToLong" )
     CommentDTO commentToEntity(Comment comment);
 
     CreateOrUpdateComment updateComment(Comment comment);
@@ -29,15 +31,17 @@ public interface CommentMapper {
 
     Comment comment(CreateOrUpdateComment updateComment);
 
-    @Named("stringToInt")
-    static int stringToInt(String value) {
-        if (value != null || value.trim().isEmpty()) {
-            return 0;
-        }
-        try {
-            return Integer.parseInt(value.trim());
-        } catch (NumberFormatException e) {
-            return 0;
-        }
+    /**
+     * методы для преобразования Instant в Long и обратно
+     */
+
+    @Named("instantToLong")
+    default Long instantToLong(Instant instant) {
+        return instant != null ? instant.toEpochMilli() : null;
+    }
+
+    @Named("longToInstant")
+    default Instant longToInstant(Long epochMillis) {
+        return epochMillis != null ? Instant.ofEpochMilli(epochMillis) : null;
     }
 }

@@ -1,100 +1,110 @@
 package ru.skypro.homework.controller;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import ru.skypro.homework.model.dto.Login;
 import ru.skypro.homework.model.dto.Register;
+import ru.skypro.homework.model.dto.Role;
 import ru.skypro.homework.service.AuthServiceImpl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
     @Mock
     private AuthServiceImpl authService;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private Authentication authentication;
 
     @InjectMocks
     private AuthController authController;
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+    private Login createTestLogin() {
+        Login login = new Login();
+        login.setUsername("test@example.com");
+        login.setPassword("password123");
+        return login;
+    }
+
+    private Register createTestRegister() {
+        Register register = new Register();
+        register.setUsername("test@example.com");
+        register.setPassword("password123");
+        register.setFirstName("John");
+        register.setLastName("Doe");
+        register.setPhone("+1234567890");
+        register.setRole(Role.USER);
+        return register;
     }
 
     @Test
-    void login_True_ReturnOk() throws Exception {
-        when(authService.login("tester", "password")).thenReturn(true);
+    void login_WithValidCredentials() {
+        Login login = createTestLogin();
 
-        String login = "{\"username\": \"tester\", \"password\": \"password\"}";
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
 
-        mockMvc.perform(post("/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(login))
-                        .andExpect(status().isOk());
+        ResponseEntity<?> response = authController.login(login);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+
+        assertNotNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
     @Test
-    void login_Fals_ReturnUnauthorized() throws Exception {
-        when(authService.login("tester", "password")).thenReturn(false);
+    void login_WithInvalidCredentials_ShouldReturnUnauthorized() {
+        Login login = createTestLogin();
 
-        String loginJson = "{\"username\": \"tester\", \"password\": \"password\"}";
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new BadCredentialsException("Bad credentials"));
 
-        mockMvc.perform(post("/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(loginJson))
-                        .andExpect(status().isUnauthorized());
+        ResponseEntity<?> response = authController.login(login);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
 
     @Test
-    void register_TrueData_ReturnCreated() throws Exception {
-        when(authService.register(any(Register.class))).thenReturn(true);
+    void register_WithNewUser() {
+        Register register = createTestRegister();
 
-        String registerJson = "{" +
-                "\"username\": \"newuser\"," +
-                "\"password\": \"password123\"," +
-                "\"firstName\": \"John\"," +
-                "\"lastName\": \"Doe\"," +
-                "\"phone\": \"+1234567890\"," +
-                "\"role\": \"USER\"" +
-                "}";
+        when(authService.register(register)).thenReturn(true);
 
-        mockMvc.perform(post("/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerJson))
-                .andExpect(status().isCreated());
+        ResponseEntity<?> response = authController.register(register);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        verify(authService).register(register);
     }
 
     @Test
-    void register_FalseData_ReturnBadRequest() throws Exception {
-        when(authService.register(any(Register.class))).thenReturn(false);
+    void register_WithExistingUsername() {
+        Register register = createTestRegister();
 
-        String registerJson = "{" +
-                "\"username\": \"newuser\"," +
-                "\"password\": \"password123\"," +
-                "\"firstName\": \"John\"," +
-                "\"lastName\": \"Doe\"," +
-                "\"phone\": \"+1234567890\"," +
-                "\"role\": \"USER\"" +
-                "}";
+        when(authService.register(register)).thenReturn(false);
 
-        mockMvc.perform(post("/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerJson))
-                .andExpect(status().isBadRequest());
+        ResponseEntity<?> response = authController.register(register);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(authService).register(register);
     }
 }

@@ -1,61 +1,105 @@
 package ru.skypro.homework.controller;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import ru.skypro.homework.model.dto.CommentDTO;
+import ru.skypro.homework.model.dto.Comments;
+import ru.skypro.homework.model.dto.CreateOrUpdateComment;
+import ru.skypro.homework.service.CommentService;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class CommentsControllerTest {
+class CommentsControllerTest {
+
+    @Mock
+    private CommentService commentService;
 
     @InjectMocks
-    private CommentsController commentsController;
+    private CommentsController commentController;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Test
+    void getAdComments_ShouldReturnComments() {
+        Long adsId = 1L;
+        CommentDTO commentDTO1 = new CommentDTO();
+        commentDTO1.setText("Comment 1");
+        CommentDTO commentDTO2 = new CommentDTO();
+        commentDTO2.setText("Comment 2");
+        List<CommentDTO> commentDTOs = List.of(commentDTO1, commentDTO2);
+        Comments comments = new Comments(2, commentDTOs);
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(commentsController).build();
+        when(commentService.getAllComments(adsId)).thenReturn(comments);
+
+        ResponseEntity<Comments> response = commentController.getAdComments(adsId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(2, response.getBody().getCount());
+        assertEquals(2, response.getBody().getResult().size());
+
+        verify(commentService).getAllComments(adsId);
     }
 
     @Test
-    void getAdComments_ReturnComment() throws Exception {
-        mockMvc.perform(get("/ads/1/comments"))
-                .andExpect(status().isOk());
+    void createComment_ShouldReturnCreatedComment() {
+        Long adsId = 1L;
+        CommentDTO requestDTO = new CommentDTO();
+        requestDTO.setText("New comment");
+
+        CommentDTO responseDTO = new CommentDTO();
+        responseDTO.setText("New comment");
+
+        when(commentService.createComment(adsId, requestDTO)).thenReturn(responseDTO);
+
+        ResponseEntity<CommentDTO> response = commentController.createComment(adsId, requestDTO);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("New comment", response.getBody().getText());
+
+        verify(commentService).createComment(adsId, requestDTO);
     }
 
     @Test
-    void createComment_ReturnComment() throws Exception {
-        String commentJson = "{\"text\": \"\"}";
+    void deleteAds_ShouldReturnOk() {
+        Long adsId = 1L;
+        Long commentId = 1L;
 
-        mockMvc.perform(post("/ads/1/comments")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(commentJson))
-                        .andExpect(status().isOk());
+        doNothing().when(commentService).deleteComment(adsId, commentId);
+
+        ResponseEntity<Void> response = commentController.deleteAds(adsId, commentId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(commentService).deleteComment(adsId, commentId);
     }
 
     @Test
-    void deleteComment_ReturnOk() throws Exception {
-        mockMvc.perform(delete("/ads/1/comments/5"))
-                .andExpect(status().isOk());
-    }
+    void editComment_ShouldReturnUpdatedComment() {
+        Long adsId = 1L;
+        Long commentId = 1L;
+        CreateOrUpdateComment updateRequest = new CreateOrUpdateComment();
+        updateRequest.setText("Updated comment");
 
-    @Test
-    void editComment_ReturnNewComment() throws Exception {
-        String updateJson = "{\"text\": \"\"}";
+        CommentDTO responseDTO = new CommentDTO();
+        responseDTO.setText("Updated comment");
 
-        mockMvc.perform(patch("/ads/1/comments/5")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updateJson))
-                        .andExpect(status().isOk());
+        when(commentService.updateComment(adsId, commentId, updateRequest)).thenReturn(responseDTO);
+
+        ResponseEntity<CommentDTO> response = commentController.editComment(adsId, commentId, updateRequest);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Updated comment", response.getBody().getText());
+
+        verify(commentService).updateComment(adsId, commentId, updateRequest);
     }
 }

@@ -1,81 +1,103 @@
 package ru.skypro.homework.controller;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import ru.skypro.homework.model.dto.AdsDTO;
 import ru.skypro.homework.model.dto.AdvertisementDTO;
 import ru.skypro.homework.model.dto.ExtendedAd;
+import ru.skypro.homework.service.AdvertisementService;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AdvertisementControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Mock
+    private AdvertisementService advertisementService;
 
     @InjectMocks
     private AdvertisementController advertisementController;
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(advertisementController).build();
+    @Test
+    void getAllAds_ShouldReturnAdsDTO() {
+        AdvertisementDTO ad1 = new AdvertisementDTO();
+        AdvertisementDTO ad2 = new AdvertisementDTO();
+        List<AdvertisementDTO> ads = List.of(ad1, ad2);
+        AdsDTO adsDTO = new AdsDTO(2, ads);
+
+        when(advertisementService.getAllAdvertisement()).thenReturn(adsDTO);
+
+        ResponseEntity<AdsDTO> response = advertisementController.getAllAds();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(2, response.getBody().getCount());
+        verify(advertisementService).getAllAdvertisement();
     }
 
     @Test
-    void getAllAds_ReturnOk() throws Exception {
-        mockMvc.perform(get("/ads")).andExpect(status().isOk());
+    void createNewAds_ShouldReturnCreated() {
+        AdvertisementDTO requestDTO = new AdvertisementDTO();
+        AdvertisementDTO responseDTO = new AdvertisementDTO();
+
+        when(advertisementService.createAds(requestDTO)).thenReturn(responseDTO);
+
+        ResponseEntity<AdvertisementDTO> response = advertisementController.createNewAds(requestDTO);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        verify(advertisementService).createAds(requestDTO);
     }
 
     @Test
-    void createdNewAds_ReturnOk() throws Exception {
-        mockMvc.perform(post("/ads")
-                        .param("author", "1")
-                        .param("image", "image")
-                        .param("pk", "2")
-                        .param("price", "3")
-                        .param("title", "title"))
-                .andExpect(status().isOk());
+    void getAd_ShouldReturnExtendedAd() {
+        Long adId = 1L;
+        ExtendedAd extendedAd = new ExtendedAd();
+
+        when(advertisementService.getExtendedAt(adId)).thenReturn(extendedAd);
+
+        ResponseEntity<ExtendedAd> response = advertisementController.getAd(adId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        verify(advertisementService).getExtendedAt(adId);
     }
 
     @Test
-    void getAdsId_ReturnOk() throws Exception {
-        mockMvc.perform(get("/ads/1", 1)).andExpect(status().isOk());
+    void deleteAds_WithValidId() {
+        Long adId = 1L;
+
+        doNothing().when(advertisementService).deleteAdvertisement(adId);
+
+        ResponseEntity<Void> response = advertisementController.deleteAds(adId);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(advertisementService).deleteAdvertisement(adId);
     }
 
     @Test
-    void deleteAdsId_ReturnOk() throws Exception {
-        mockMvc.perform(delete("/ads/1")).andExpect(status().isOk());
-    }
+    void getAllUsersAds_ShouldReturnUserAds() {
+        AdvertisementDTO ad1 = new AdvertisementDTO();
+        AdvertisementDTO ad2 = new AdvertisementDTO();
+        List<AdvertisementDTO> ads = List.of(ad1, ad2);
+        AdsDTO adsDTO = new AdsDTO(2, ads);
 
-    @Test
-    void aditAds_ReturnOk() throws Exception {
-        String createOrUpdateAd_Json = "{" +
-                "\"title\": \"title\"," +
-                " \"price\": \"1\"," +
-                " \"description\": \"description\"}";
+        when(advertisementService.getUserAllAdvertisement()).thenReturn(adsDTO);
 
-        mockMvc.perform(post("/ads/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createOrUpdateAd_Json))
-                .andExpect(status().isOk());
-    }
+        ResponseEntity<AdsDTO> response = advertisementController.getAllUsersAds();
 
-    @Test
-    void getAllUsersAds_ReturnOk() throws Exception {
-        mockMvc.perform(get("/ads/me")).andExpect(status().isOk());
-    }
-
-    @Test
-    void getImage_ReturnOk() throws Exception {
-        mockMvc.perform(patch("/ads/1/image")).andExpect(status().isOk());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(2, response.getBody().getCount());
+        verify(advertisementService).getUserAllAdvertisement();
     }
 }

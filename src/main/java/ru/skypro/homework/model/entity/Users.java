@@ -8,6 +8,8 @@ import ru.skypro.homework.model.dto.Role;
 import javax.persistence.*;
 import java.util.List;
 
+import static ru.skypro.homework.utils.PatternUtils.*;
+
 @Entity
 @Table(name = "users")
 public class Users {
@@ -42,14 +44,8 @@ public class Users {
     private String image;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "\\+7\\s?\\(?\\d{3}\\)?\\s?\\d{3}-?\\d{2}-?\\d{2}",
-            message = "Phone number must have the appearance:" +
-                    " +7(777)7777777 \n" +
-                    " +77777777777 \n" +
-                    " +7 777 777-77-77 \n" +
-                    " +7 (777) 777-77-77 \n" +
-                    " +7(777)777-77-77 \n" +
-                    " +7 7777777777")
+    @Pattern(regexp = PATTERN_PHONE,
+            message = "Phone number must have the appearance:" + PATTERN_NUMBER_PHONE)
     @Column(name = "phone")
     private String phone;
 
@@ -58,6 +54,9 @@ public class Users {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Comment> comment;
+
+    @Column(name = "enabled")
+    private boolean enabled = true;
 
     public Users(String username,
                  String password,
@@ -79,13 +78,33 @@ public class Users {
         this.comment = comment;
     }
 
-    public Users() {
+    public Users(String username,
+                 String password,
+                 String firstName,
+                 String lastName,
+                 Role role,
+                 String image,
+                 String phone,
+                 List<Advertisement> advertisement,
+                 List<Comment> comment,
+                 boolean enabled) {
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.role = role;
+        this.image = image;
+        this.phone = phone;
+        this.advertisement = advertisement;
+        this.comment = comment;
+        this.enabled = enabled;
     }
+
+    public Users() {}
 
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -93,7 +112,6 @@ public class Users {
     public String getUsername() {
         return username;
     }
-
     public void setUsername(String username) {
         this.username = username;
     }
@@ -101,7 +119,6 @@ public class Users {
     public String getPassword() {
         return password;
     }
-
     public void setPassword(String password) {
         this.password = password;
     }
@@ -109,7 +126,6 @@ public class Users {
     public String getFirstName() {
         return firstName;
     }
-
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -117,7 +133,6 @@ public class Users {
     public String getLastName() {
         return lastName;
     }
-
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
@@ -125,7 +140,6 @@ public class Users {
     public Role getRole() {
         return role;
     }
-
     public void setRole(Role role) {
         this.role = role;
     }
@@ -133,7 +147,6 @@ public class Users {
     public String getImage() {
         return image;
     }
-
     public void setImage(String image) {
         this.image = image;
     }
@@ -141,7 +154,6 @@ public class Users {
     public String getPhone() {
         return phone;
     }
-
     public void setPhone(String phone) {
         this.phone = phone;
     }
@@ -149,7 +161,6 @@ public class Users {
     public List<Advertisement> getAdvertisement() {
         return advertisement;
     }
-
     public void setAdvertisement(List<Advertisement> advertisement) {
         this.advertisement = advertisement;
     }
@@ -157,8 +168,14 @@ public class Users {
     public List<Comment> getComment() {
         return comment;
     }
-
     public void setComment(List<Comment> comment) {
         this.comment = comment;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }
