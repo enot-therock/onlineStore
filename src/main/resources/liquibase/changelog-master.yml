@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/changes/changeSet_001.sql
+  - include:
+      file: liquibase/changes/changeSet_002.sql
+  - include:
+      file: liquibase/changes/changeSet_003.sql
+  - include:
+      file: liquibase/changes/changeSet_004.sql
+  - include:
+      file: liquibase/changes/changeSet_005.sql
+  - include:
+      file: liquibase/changes/changeSet_006.sql
+  - include:
+      file: liquibase/changes/changeSet_007.sql
