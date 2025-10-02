@@ -5,11 +5,11 @@ import java.util.List;
 public class Comments {
 
     private int count;
-    private List<CommentDTO> result;
+    private List<CommentDTO> results;
 
-    public Comments(int count, List<CommentDTO> result) {
+    public Comments(int count, List<CommentDTO> results) {
         this.count = count;
-        this.result = result;
+        this.results = results;
     }
 
     public Comments() {
@@ -24,10 +24,10 @@ public class Comments {
     }
 
     public List<CommentDTO> getResult() {
-        return result;
+        return results;
     }
 
-    public void setResult(List<CommentDTO> result) {
-        this.result = result;
+    public void setResult(List<CommentDTO> results) {
+        this.results = results;
     }
 }

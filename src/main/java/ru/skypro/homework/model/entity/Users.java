@@ -40,9 +40,6 @@ public class Users {
     @Column(name = "role")
     private Role role;
 
-    @Column(name = "image")
-    private String image;
-
     @NotBlank(message = "Phone number is required")
     @Pattern(regexp = PATTERN_PHONE,
             message = "Phone number must have the appearance:" + PATTERN_NUMBER_PHONE)
@@ -55,6 +52,9 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Comment> comment;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Image image;
+
     @Column(name = "enabled")
     private boolean enabled = true;
 
@@ -63,19 +63,19 @@ public class Users {
                  String firstName,
                  String lastName,
                  Role role,
-                 String image,
                  String phone,
                  List<Advertisement> advertisement,
-                 List<Comment> comment) {
+                 List<Comment> comment,
+                 Image image) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
-        this.image = image;
         this.phone = phone;
         this.advertisement = advertisement;
         this.comment = comment;
+        this.image = image;
     }
 
     public Users(String username,
@@ -83,20 +83,20 @@ public class Users {
                  String firstName,
                  String lastName,
                  Role role,
-                 String image,
                  String phone,
                  List<Advertisement> advertisement,
                  List<Comment> comment,
+                 Image image,
                  boolean enabled) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
-        this.image = image;
         this.phone = phone;
         this.advertisement = advertisement;
         this.comment = comment;
+        this.image = image;
         this.enabled = enabled;
     }
 
@@ -144,12 +144,9 @@ public class Users {
         this.role = role;
     }
 
-    public String getImage() {
-        return image;
-    }
-    public void setImage(String image) {
-        this.image = image;
-    }
+    public Image getImage() {return image;}
+
+    public void setImage(Image image) {this.image = image;}
 
     public String getPhone() {
         return phone;
@@ -172,10 +169,6 @@ public class Users {
         this.comment = comment;
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+    public boolean isEnabled() {return enabled;}
+    public void setEnabled(boolean enabled) {this.enabled = enabled;}
 }

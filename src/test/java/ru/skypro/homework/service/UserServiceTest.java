@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.skypro.homework.excepption.ForbiddenException;
+import ru.skypro.homework.excepption.NotFoundException;
 import ru.skypro.homework.excepption.UnauthorizedException;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.model.dto.UpdateUser;
@@ -135,7 +136,7 @@ public class UserServiceTest {
 
         assertThatThrownBy(() -> usersService.setPassword("oldPassword123", "newPassword456"))
                 .isInstanceOf(UnauthorizedException.class)
-                .hasMessageContaining("User not found");
+                .hasMessageContaining("User not authenticated");
     }
 
     @Test
@@ -147,7 +148,7 @@ public class UserServiceTest {
 
         UpdateUser expectedUpdateUser = new UpdateUser(
                 "NewFirstName", "NewLastName", "+79992222222");
-        when(userMapper.userResponseUpdate(testUser)).thenReturn(expectedUpdateUser);
+        when(userMapper.toUpdateUserDTO(testUser)).thenReturn(expectedUpdateUser);
 
         UpdateUser result = usersService.updateUser(
                 "NewFirstName", "NewLastName", "+79992222222");
@@ -157,7 +158,7 @@ public class UserServiceTest {
         assertThat(testUser.getLastName()).isEqualTo("NewLastName");
         assertThat(testUser.getPhone()).isEqualTo("+79992222222");
         verify(usersRepository).save(testUser);
-        verify(userMapper).userResponseUpdate(testUser);
+        verify(userMapper).toUpdateUserDTO(testUser);
     }
 
     @Test
@@ -168,7 +169,7 @@ public class UserServiceTest {
         when(usersRepository.save(any(Users.class))).thenReturn(testUser);
 
         UpdateUser expectedUpdateUser = new UpdateUser("NewFirstName", "Doe", "+79991234567");
-        when(userMapper.userResponseUpdate(testUser)).thenReturn(expectedUpdateUser);
+        when(userMapper.toUpdateUserDTO(testUser)).thenReturn(expectedUpdateUser);
 
         UpdateUser result = usersService.updateUser("NewFirstName", null, null);
 
@@ -210,7 +211,7 @@ public class UserServiceTest {
         when(usersRepository.findByUsername("test@mail.com")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> usersService.getCurrentUser())
-                .isInstanceOf(UnauthorizedException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("User not found");
     }
 

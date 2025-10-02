@@ -56,7 +56,7 @@ public class CommentService {
         comment.setText(commentDTO.getText());
 
         Comment createComment = commentRepository.save(comment);
-        return commentMapper.commentToEntity(createComment);
+        return commentMapper.toCommentDTO(createComment);
     }
 
     /**
@@ -71,7 +71,7 @@ public class CommentService {
         }
         List<Comment> comments = commentRepository.findByAdvertisementIdOrderByCreatedAtDesc(adsId);
         List<CommentDTO> commentDTOS = comments.stream()
-                .map(commentMapper::commentToEntity)
+                .map(commentMapper::toCommentDTO)
                 .collect(Collectors.toList());
         return new Comments(commentDTOS.size(), commentDTOS);
     }
@@ -116,7 +116,7 @@ public class CommentService {
         comment.setText(commentUpdate.getText());
         Comment updatedComment = commentRepository.save(comment);
 
-        return commentMapper.commentToEntity(updatedComment);
+        return commentMapper.toCommentDTO(updatedComment);
     }
 
     /**

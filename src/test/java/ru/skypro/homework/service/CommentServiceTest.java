@@ -92,7 +92,7 @@ public class CommentServiceTest {
         when(usersService.getCurrentUser()).thenReturn(user);
         when(advertisementRepository.findById(adsId)).thenReturn(Optional.of(ad));
         when(commentRepository.save(any(Comment.class))).thenReturn(comment);
-        when(commentMapper.commentToEntity(comment)).thenReturn(expectedCommentDTO);
+        when(commentMapper.toCommentDTO(comment)).thenReturn(expectedCommentDTO);
 
         CommentDTO result = commentService.createComment(adsId, commentDTO);
 
@@ -102,7 +102,7 @@ public class CommentServiceTest {
         verify(usersService).getCurrentUser();
         verify(advertisementRepository).findById(adsId);
         verify(commentRepository).save(any(Comment.class));
-        verify(commentMapper).commentToEntity(comment);
+        verify(commentMapper).toCommentDTO(comment);
     }
 
     @Test
@@ -137,8 +137,8 @@ public class CommentServiceTest {
 
         when(advertisementRepository.existsById(adsId)).thenReturn(true);
         when(commentRepository.findByAdvertisementIdOrderByCreatedAtDesc(adsId)).thenReturn(comments);
-        when(commentMapper.commentToEntity(comment1)).thenReturn(commentDTO1);
-        when(commentMapper.commentToEntity(comment2)).thenReturn(commentDTO2);
+        when(commentMapper.toCommentDTO(comment1)).thenReturn(commentDTO1);
+        when(commentMapper.toCommentDTO(comment2)).thenReturn(commentDTO2);
 
         Comments result = commentService.getAllComments(adsId);
 
@@ -149,7 +149,7 @@ public class CommentServiceTest {
 
         verify(advertisementRepository).existsById(adsId);
         verify(commentRepository).findByAdvertisementIdOrderByCreatedAtDesc(adsId);
-        verify(commentMapper, times(2)).commentToEntity(any(Comment.class));
+        verify(commentMapper, times(2)).toCommentDTO(any(Comment.class));
     }
 
     @Test
@@ -188,7 +188,7 @@ public class CommentServiceTest {
         when(commentRepository.findByIdAndAdvertisementId(commentId, adsId)).thenReturn(Optional.of(comment));
         when(usersService.getCurrentUser()).thenReturn(owner);
         when(commentRepository.save(any(Comment.class))).thenReturn(updatedComment);
-        when(commentMapper.commentToEntity(updatedComment)).thenReturn(expectedCommentDTO);
+        when(commentMapper.toCommentDTO(updatedComment)).thenReturn(expectedCommentDTO);
 
         CommentDTO result = commentService.updateComment(adsId, commentId, updateRequest);
 

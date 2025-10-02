@@ -7,7 +7,7 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private String phone;
-    private Role role;
+    private String role;
     private String image;
 
     public UserDTO(int id,
@@ -15,7 +15,7 @@ public class UserDTO {
                    String firstName,
                    String lastName,
                    String phone,
-                   Role role,
+                   String role,
                    String image) {
         this.id = id;
         this.email = email;
@@ -68,11 +68,11 @@ public class UserDTO {
         this.phone = phone;
     }
 
-    public Role getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(String role) {
         this.role = role;
     }
 

@@ -3,7 +3,7 @@ package ru.skypro.homework.model.dto;
 public class ExtendedAd {
 
     private int pk;
-    private String authorFirsName;
+    private String authorFirstName;
     private String authorLastName;
     private String description;
     private String email;
@@ -13,7 +13,7 @@ public class ExtendedAd {
     private String title;
 
     public ExtendedAd(int pk,
-                      String authorFirsName,
+                      String authorFirstName,
                       String authorLastName,
                       String description,
                       String email,
@@ -22,7 +22,7 @@ public class ExtendedAd {
                       int price,
                       String title) {
         this.pk = pk;
-        this.authorFirsName = authorFirsName;
+        this.authorFirstName = authorFirstName;
         this.authorLastName = authorLastName;
         this.description = description;
         this.email = email;
@@ -43,12 +43,12 @@ public class ExtendedAd {
         this.pk = pk;
     }
 
-    public String getAuthorFirsName() {
-        return authorFirsName;
+    public String getAuthorFirstName() {
+        return authorFirstName;
     }
 
-    public void setAuthorFirsName(String authorFirsName) {
-        this.authorFirsName = authorFirsName;
+    public void setAuthorFirstName(String authorFirsName) {
+        this.authorFirstName = authorFirstName;
     }
 
     public String getAuthorLastName() {

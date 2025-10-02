@@ -2,9 +2,11 @@ package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import ru.skypro.homework.model.dto.NewPassword;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import ru.skypro.homework.model.dto.UpdateUser;
 import ru.skypro.homework.model.dto.UserDTO;
+import ru.skypro.homework.model.entity.Image;
 import ru.skypro.homework.model.entity.Users;
 
 @Mapper(componentModel = "spring")
@@ -14,28 +16,55 @@ public interface UserMapper {
      * Маппим из Entity в DTO
      */
 
-    @Mapping(target = "id", expression = "java(user.getId().intValue())")
+    @Mapping(source = "id", target = "id")
     @Mapping(source = "username", target = "email")
-    UserDTO userToEntity(Users user);
+    @Mapping(source = "firstName", target = "firstName")
+    @Mapping(source = "lastName", target = "lastName")
+    @Mapping(source = "phone", target = "phone")
+    @Mapping(source = "role", target = "role")
+    @Mapping(source = "image", target = "image", qualifiedByName = "mapUserImageToUrl")
+    UserDTO toUserDTO(Users user);
 
-    UpdateUser userResponseUpdate(Users user);
-
-    @Mapping(source = "newPassword", target = "newPassword")
-    NewPassword userSetPassword(Users users, String newPassword);
+    @Mapping(source = "firstName", target = "firstName")
+    @Mapping(source = "lastName", target = "lastName")
+    @Mapping(source = "phone", target = "phone")
+    UpdateUser toUpdateUserDTO(Users user);
 
     /**
      * Маппим обратно и обновляем данные
      */
 
-    @Mapping(target = "id", expression = "java((long) userDTO.getId())")
+    @Mapping(source = "firstName", target = "firstName")
+    @Mapping(source = "lastName", target = "lastName")
+    @Mapping(source = "phone", target = "phone")
+    void updateUserFromDTO(UpdateUser updateUserDTO, @MappingTarget Users user);
+
+    /**
+     * доп методы для преобразования Image в строку и обратно
+     */
+
+    @Mapping(source = "id", target = "id")
     @Mapping(source = "email", target = "username")
-    Users toEntity(UserDTO userDTO);
+    @Mapping(source = "firstName", target = "firstName")
+    @Mapping(source = "lastName", target = "lastName")
+    @Mapping(source = "phone", target = "phone")
+    @Mapping(source = "role", target = "role")
+    @Mapping(source = "image", target = "image", qualifiedByName = "mapUrlToUserImage")
+    Users toUserEntity(UserDTO userDTO);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "image", ignore = true)
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "role", ignore = true)
-    @Mapping(target = "username", ignore = true)
-    Users updateToEntity(UpdateUser updateUser);
+    @Named("mapUserImageToUrl")
+    default String mapUserImageToUrl(Image image) {
+        if (image == null) {
+            return null;
+        }
+        return "/users/me/image";
+    }
 
+    @Named("mapUrlToUserImage")
+    default Image mapUrlToUserImage(String filePath) {
+        if (filePath == null) return null;
+        Image image = new Image();
+        image.setFilePath(filePath);
+        return image;
+    }
 }

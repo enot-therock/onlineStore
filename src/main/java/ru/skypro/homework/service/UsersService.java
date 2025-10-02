@@ -5,6 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.excepption.ForbiddenException;
+import ru.skypro.homework.excepption.NotFoundException;
 import ru.skypro.homework.excepption.UnauthorizedException;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.model.dto.UpdateUser;
@@ -75,7 +76,7 @@ public class UsersService {
         }
 
         Users user = usersRepository.save(currentUser);
-        return userMapper.userResponseUpdate(user);
+        return userMapper.toUpdateUserDTO(user);
     }
 
     /**
@@ -91,6 +92,6 @@ public class UsersService {
 
         String username = authentication.getName();
         return usersRepository.findByUsername(username)
-                .orElseThrow(() -> new UnauthorizedException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 }

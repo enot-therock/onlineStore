@@ -18,9 +18,6 @@ public class Advertisement {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "image")
-    private String image;
-
     @NotBlank(message = "Title is required")
     @Size(min = 4, max = 32, message = "Title must be between 4 and 32 symbol")
     @Column(name = "title")
@@ -37,8 +34,11 @@ public class Advertisement {
     @OneToMany(mappedBy = "advertisement", cascade = CascadeType.ALL)
     private List<Comment> comment;
 
+    @OneToOne(mappedBy = "advertisement", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Image image;
+
     public Advertisement(String description,
-                         String image,
+                         Image image,
                          String title,
                          int price,
                          Users user,
@@ -68,12 +68,10 @@ public class Advertisement {
         this.description = description;
     }
 
-    public String getImage() {
+    public Image getImage() {
         return image;
     }
-    public void setImage(String image) {
-        this.image = image;
-    }
+    public void setImage(Image image) {this.image = image;}
 
     public String getTitle() {
         return title;

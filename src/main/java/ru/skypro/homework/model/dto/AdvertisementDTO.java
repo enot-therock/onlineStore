@@ -8,7 +8,11 @@ public class AdvertisementDTO {
     private int price;
     private String title;
 
-    public AdvertisementDTO(int author, String image, int pk, int price, String title) {
+    public AdvertisementDTO(int author,
+                            String image,
+                            int pk,
+                            int price,
+                            String title) {
         this.author = author;
         this.image = image;
         this.pk = pk;

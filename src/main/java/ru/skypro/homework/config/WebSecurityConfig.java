@@ -2,6 +2,7 @@ package ru.skypro.homework.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,7 +29,9 @@ public class WebSecurityConfig {
             "/v3/api-docs",
             "/webjars/**",
             "/login",
-            "/register"
+            "/register",
+            "/ads/image/**",
+            "/users/image/**"
     };
 
     @Bean
@@ -39,7 +42,11 @@ public class WebSecurityConfig {
                 authorization ->
                     authorization
                         .mvcMatchers(AUTH_WHITELIST).permitAll()
-                        .mvcMatchers("/ads/**", "/users/**").authenticated())
+                        .mvcMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .mvcMatchers(HttpMethod.GET, "/users/me/image").authenticated()
+                        .mvcMatchers( "/ads/**", "/users/**").authenticated()
+                        .mvcMatchers("/ads/image/**").permitAll()
+                        .mvcMatchers("/users/image/**").permitAll())
             .cors()
             .and()
             .httpBasic(withDefaults())
@@ -58,5 +65,6 @@ public class WebSecurityConfig {
 
         return configuration.getAuthenticationManager();
     }
+
 }
 

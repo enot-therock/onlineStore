@@ -1,6 +1,5 @@
 package ru.skypro.homework.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +8,6 @@ import ru.skypro.homework.model.dto.Comments;
 import ru.skypro.homework.model.dto.CreateOrUpdateComment;
 import ru.skypro.homework.service.CommentService;
 
-@Slf4j
 @RestController
 @RequestMapping("/ads")
 @CrossOrigin(value = "http://localhost:3000")
@@ -30,7 +28,7 @@ public class CommentsController {
      */
 
     @GetMapping("/{id}/comments")
-    public ResponseEntity<Comments> getAdComments(@PathVariable Long adsId) {
+    public ResponseEntity<Comments> getAdComments(@PathVariable("id") Long adsId) {
         Comments comments = commentService.getAllComments(adsId);
         return ResponseEntity.ok(comments);
     }
@@ -44,7 +42,7 @@ public class CommentsController {
      */
 
     @PostMapping("/{id}/comments")
-    public ResponseEntity<CommentDTO> createComment(@PathVariable Long adsId,
+    public ResponseEntity<CommentDTO> createComment(@PathVariable("id") Long adsId,
                                                     @RequestBody CommentDTO commentDTO) {
 
         CommentDTO comments = commentService.createComment(adsId, commentDTO);
@@ -61,8 +59,8 @@ public class CommentsController {
      */
 
     @DeleteMapping("/{adId}/comments/{commentId}")
-    public ResponseEntity<Void> deleteAds(@PathVariable Long adsId, @PathVariable Long commentId) {
-        commentService.deleteComment(adsId, commentId);
+    public ResponseEntity<Void> deleteAds(@PathVariable Long adId, @PathVariable Long commentId) {
+        commentService.deleteComment(adId, commentId);
         return ResponseEntity.ok().build();
     }
 
@@ -76,10 +74,10 @@ public class CommentsController {
      */
 
     @PatchMapping("/{adId}/comments/{commentId}")
-    public ResponseEntity<CommentDTO> editComment(@PathVariable Long adsId,
+    public ResponseEntity<CommentDTO> editComment(@PathVariable Long adId,
                                                   @PathVariable Long commentId,
                                                   @RequestBody CreateOrUpdateComment updateComment) {
-        CommentDTO commentDTO = commentService.updateComment(adsId, commentId, updateComment);
+        CommentDTO commentDTO = commentService.updateComment(adId, commentId, updateComment);
         return ResponseEntity.ok(commentDTO);
     }
 }

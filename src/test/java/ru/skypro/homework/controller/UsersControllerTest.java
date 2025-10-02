@@ -57,7 +57,7 @@ class UsersControllerTest {
         userDTO.setEmail("test@example.com");
 
         when(usersService.getCurrentUser()).thenReturn(user);
-        when(userMapper.userToEntity(user)).thenReturn(userDTO);
+        when(userMapper.toUserDTO(user)).thenReturn(userDTO);
 
         ResponseEntity<UserDTO> response = userController.getUsersInfo();
 
@@ -67,7 +67,7 @@ class UsersControllerTest {
         assertEquals("test@example.com", response.getBody().getEmail());
 
         verify(usersService).getCurrentUser();
-        verify(userMapper).userToEntity(user);
+        verify(userMapper).toUserDTO(user);
     }
 
     @Test

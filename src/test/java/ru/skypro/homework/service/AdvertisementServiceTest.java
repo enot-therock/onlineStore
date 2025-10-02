@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.excepption.ForbiddenException;
 import ru.skypro.homework.excepption.NotFoundException;
 import ru.skypro.homework.mapper.AdvertisementMapper;
@@ -13,6 +14,7 @@ import ru.skypro.homework.model.entity.Advertisement;
 import ru.skypro.homework.model.entity.Users;
 import ru.skypro.homework.repository.AdvertisementRepository;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +30,9 @@ class AdvertisementServiceTest {
 
     @Mock
     private UsersService usersService;
+
+    @Mock
+    private ImageService imageService;
 
     @Mock
     private AdvertisementMapper advertisementMapper;
@@ -68,27 +73,44 @@ class AdvertisementServiceTest {
         return updateAd;
     }
 
+    private AdvertisementDTO createSampleAdvertisementDTO() {
+        return new AdvertisementDTO(
+                1, // author
+                "test-image.jpg", // image
+                1, // pk
+                1000, // price
+                "Test Advertisement" // title
+        );
+    }
+
     @Test
-    void createAds_WithValidData() {
-        Users currentUser = createTestUser(1L, "test@example.com", Role.USER);
-        AdvertisementDTO requestDTO = createTestAdDTO();
-        Advertisement ad = createTestAd(1L, currentUser);
-        AdvertisementDTO responseDTO = createTestAdDTO();
+    void createAds_WithValidData() throws IOException {
+        CreateOrUpdateAd createOrUpdateAd = createTestUpdateAd();
+        MultipartFile file = mock(MultipartFile.class);
+        Users currentUser = createTestUser(1L, "owner@example.com", Role.USER);
+        Advertisement savedAdvertisement = createTestAd(1L, currentUser);
+        Advertisement updatedAdvertisement = createTestAd(1L, currentUser);
+        AdvertisementDTO expectedDto = createSampleAdvertisementDTO();
 
         when(usersService.getCurrentUser()).thenReturn(currentUser);
-        when(advertisementMapper.ads(requestDTO)).thenReturn(ad);
-        when(advertisementRepository.save(any(Advertisement.class))).thenReturn(ad);
-        when(advertisementMapper.adsToEntity(ad)).thenReturn(responseDTO);
+        when(advertisementRepository.save(any(Advertisement.class))).thenReturn(savedAdvertisement);
+        when(advertisementRepository.findById(savedAdvertisement.getId())).thenReturn(Optional.of(updatedAdvertisement));
+        when(advertisementMapper.toAdvertisementDTO(savedAdvertisement)).thenReturn(expectedDto);
 
-        AdvertisementDTO result = advertisementService.createAds(requestDTO);
+        // Act
+        AdvertisementDTO result = advertisementService.addAd(createOrUpdateAd, file);
 
+        // Assert
         assertNotNull(result);
-        verify(usersService).getCurrentUser();
-        verify(advertisementMapper).ads(requestDTO);
-        verify(advertisementRepository).save(ad);
-        verify(advertisementMapper).adsToEntity(ad);
-        assertEquals(currentUser, ad.getUser());
+        assertEquals(expectedDto, result);
+
+        verify(usersService, times(1)).getCurrentUser();
+        verify(advertisementRepository, times(1)).save(any(Advertisement.class));
+        verify(imageService, times(1)).savedAdvertisementImage(eq(savedAdvertisement), eq(file));
+        verify(advertisementRepository, times(1)).findById(savedAdvertisement.getId());
+        verify(advertisementMapper, times(1)).toAdvertisementDTO(savedAdvertisement);
     }
+
 
     @Test
     void updateAds_WhenUserIsOwner() {
@@ -102,7 +124,7 @@ class AdvertisementServiceTest {
         when(usersService.getCurrentUser()).thenReturn(owner);
         when(advertisementRepository.findById(adId)).thenReturn(Optional.of(ad));
         when(advertisementRepository.save(any(Advertisement.class))).thenReturn(ad);
-        when(advertisementMapper.adsToEntity(ad)).thenReturn(responseDTO);
+        when(advertisementMapper.toAdvertisementDTO(ad)).thenReturn(responseDTO);
 
         AdvertisementDTO result = advertisementService.updateAds(adId, updateRequest);
 
@@ -137,13 +159,13 @@ class AdvertisementServiceTest {
         ExtendedAd extendedAd = new ExtendedAd();
 
         when(advertisementRepository.findById(adId)).thenReturn(Optional.of(ad));
-        when(advertisementMapper.extendedAdResponse(ad)).thenReturn(extendedAd);
+        when(advertisementMapper.toExtendedAd(ad)).thenReturn(extendedAd);
 
         ExtendedAd result = advertisementService.getExtendedAt(adId);
 
         assertNotNull(result);
         verify(advertisementRepository).findById(adId);
-        verify(advertisementMapper).extendedAdResponse(ad);
+        verify(advertisementMapper).toExtendedAd(ad);
     }
 
     @Test
@@ -197,8 +219,8 @@ class AdvertisementServiceTest {
         AdvertisementDTO dto2 = createTestAdDTO();
 
         when(advertisementRepository.findAll()).thenReturn(ads);
-        when(advertisementMapper.adsToEntity(ad1)).thenReturn(dto1);
-        when(advertisementMapper.adsToEntity(ad2)).thenReturn(dto2);
+        when(advertisementMapper.toAdvertisementDTO(ad1)).thenReturn(dto1);
+        when(advertisementMapper.toAdvertisementDTO(ad2)).thenReturn(dto2);
 
         AdsDTO result = advertisementService.getAllAdvertisement();
 
@@ -206,7 +228,7 @@ class AdvertisementServiceTest {
         assertEquals(2, result.getCount());
         assertEquals(2, result.getResult().size());
         verify(advertisementRepository).findAll();
-        verify(advertisementMapper, times(2)).adsToEntity(any(Advertisement.class));
+        verify(advertisementMapper, times(2)).toAdvertisementDTO(any(Advertisement.class));
     }
 
     @Test
@@ -221,8 +243,8 @@ class AdvertisementServiceTest {
 
         when(usersService.getCurrentUser()).thenReturn(currentUser);
         when(advertisementRepository.findByUser(currentUser)).thenReturn(userAds);
-        when(advertisementMapper.adsToEntity(ad1)).thenReturn(dto1);
-        when(advertisementMapper.adsToEntity(ad2)).thenReturn(dto2);
+        when(advertisementMapper.toAdvertisementDTO(ad1)).thenReturn(dto1);
+        when(advertisementMapper.toAdvertisementDTO(ad2)).thenReturn(dto2);
 
         AdsDTO result = advertisementService.getUserAllAdvertisement();
 
@@ -231,6 +253,6 @@ class AdvertisementServiceTest {
         assertEquals(2, result.getResult().size());
         verify(usersService).getCurrentUser();
         verify(advertisementRepository).findByUser(currentUser);
-        verify(advertisementMapper, times(2)).adsToEntity(any(Advertisement.class));
+        verify(advertisementMapper, times(2)).toAdvertisementDTO(any(Advertisement.class));
     }
 }

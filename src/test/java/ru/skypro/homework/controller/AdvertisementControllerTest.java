@@ -7,11 +7,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.model.dto.AdsDTO;
 import ru.skypro.homework.model.dto.AdvertisementDTO;
+import ru.skypro.homework.model.dto.CreateOrUpdateAd;
 import ru.skypro.homework.model.dto.ExtendedAd;
 import ru.skypro.homework.service.AdvertisementService;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,17 +48,26 @@ public class AdvertisementControllerTest {
     }
 
     @Test
-    void createNewAds_ShouldReturnCreated() {
-        AdvertisementDTO requestDTO = new AdvertisementDTO();
-        AdvertisementDTO responseDTO = new AdvertisementDTO();
+    void createNewAds_ShouldReturnCreated() throws IOException {
+        CreateOrUpdateAd properties = new CreateOrUpdateAd();
+        properties.setTitle("Test Advertisement");
+        properties.setPrice(1000);
+        properties.setDescription("Test Description");
 
-        when(advertisementService.createAds(requestDTO)).thenReturn(responseDTO);
+        MultipartFile image = mock(MultipartFile.class);
+        AdvertisementDTO expectedDto = new AdvertisementDTO(1, "test-image.jpg", 1, 1000, "Test Advertisement");
 
-        ResponseEntity<AdvertisementDTO> response = advertisementController.createNewAds(requestDTO);
+        when(advertisementService.addAd(properties, image)).thenReturn(expectedDto);
+
+        ResponseEntity<AdvertisementDTO> response = advertisementController.addAd(properties, image);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
-        verify(advertisementService).createAds(requestDTO);
+        assertEquals(expectedDto, response.getBody());
+        assertEquals(1, response.getBody().getPk());
+        assertEquals("Test Advertisement", response.getBody().getTitle());
+        assertEquals(1000, response.getBody().getPrice());
+        verify(advertisementService).addAd(properties, image);
     }
 
     @Test

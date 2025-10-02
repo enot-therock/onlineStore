@@ -5,11 +5,11 @@ import java.util.List;
 public class AdsDTO {
 
     private int count;
-    private List<AdvertisementDTO> result;
+    private List<AdvertisementDTO> results;
 
-    public AdsDTO(int count, List<AdvertisementDTO> result) {
+    public AdsDTO(int count, List<AdvertisementDTO> results) {
         this.count = count;
-        this.result = result;
+        this.results = results;
     }
 
     public AdsDTO() {
@@ -24,10 +24,10 @@ public class AdsDTO {
     }
 
     public List<AdvertisementDTO> getResult() {
-        return result;
+        return results;
     }
 
-    public void setResult(List<AdvertisementDTO> result) {
-        this.result = result;
+    public void setResult(List<AdvertisementDTO> results) {
+        this.results = results;
     }
 }
